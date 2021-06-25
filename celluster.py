@@ -3,12 +3,12 @@ import pandas as pd
 
 '''
 Parse arguments.
-Input file and output directory are required.
+Input file is required.
 '''
 def parseArgs():
     parser = argparse.ArgumentParser(description='Cluster cell types using mcmicro marker expression data.')
     parser.add_argument('-i', '--input', help="Input CSV of mcmicro marker expression data for cells", type=str, required=True)
-    parser.add_argument('-o', '--output', help='The directory to which output files will be saved', type=str, required=True)
+    parser.add_argument('-o', '--output', help='The directory to which output files will be saved', type=str, required=False)
     parser.add_argument('-m', '--markers', help='A text file with a marker on each line to specify which markers to use for clustering', type=str, required=False)
     args = parser.parse_args()
     return args
@@ -16,7 +16,7 @@ def parseArgs():
 
 '''
 Clean data in input file.
-Currently we are doing this with pandas however, using csv might be faster.
+NOTE: Currently we are doing this with pandas however, using csv might be faster.
 
 Exclude the following data from clustering:
     - X_centroid, …, Extent, Orientation - morphological features
@@ -35,26 +35,33 @@ def clean(input_file):
 
     # a default list of features to exclude from clustering
     FEATURES_TO_REMOVE = ['X_centroid', 'Y_centroid', # morphological features
-                    'column_centroid', 'row_centroid', 
-                    'Area', 'MajorAxisLength', 
-                    'MinorAxisLength', 'Eccentricity', 
-                    'Solidity', 'Extent', 'Orientation', 
-                    'DNA', 'Hoechst', 'DAP', # DNA stain
-                    'AF', # autofluorescence
-                    'A'] # secondary antibody staining only
+                        'column_centroid', 'row_centroid', 
+                        'Area', 'MajorAxisLength', 
+                        'MinorAxisLength', 'Eccentricity', 
+                        'Solidity', 'Extent', 'Orientation', 
+                        'DNA', 'Hoechst', 'DAP', # DNA stain
+                        'AF', # autofluorescence
+                        'A'] # secondary antibody staining only
 
-    # drop any columns in the input csv that should be excluded from clustering be default
+    # find any columns in the input csv that should be excluded from clustering be default
+    # NOTE: may want to replace this with regex, it might be faster.
+    col_to_remove = []
     for col in data.columns:
         for feature in FEATURES_TO_REMOVE:
             if col.startswith(feature):
-                data.drop(col, axis=1)
+                col_to_remove.append(col)
+    
+    # drop all columns that should be excluded
+    data = data.drop(columns=col_to_remove, axis=1)
 
     # save cleaned data to csv
-    data.to_csv(f'cleaned_{input_file}')
+    data.to_csv(f'{output}/clean_data.csv', index=False)
 
 '''
 Main.
 '''
 if __name__ == '__main__':
     args = parseArgs() # parse arguments
-    clean(args.i)
+    if args.output is None:
+        output = '.'
+    clean(args.input)
