@@ -57,6 +57,23 @@ def clean(input_file):
     # save cleaned data to csv
     data.to_csv(f'{output}/clean_data.csv', index=False)
 
+
+'''
+Run an R script that runs FastPG. Scriptception.
+'''
+def runFastPG():
+    import subprocess
+
+    r_script = ['Rscript runFastPG.r'] # use FastPG.r script
+    r_args = [f'{output}/clean_data.csv', '30'] # current hardcoded arguments will be provided by user in future version
+
+    # Build subprocess command
+    command = r_script + r_args
+
+    # run R script and get modularity from stdout 
+    modularity = subprocess.check_output(command, universal_newlines=True)
+
+
 '''
 Main.
 '''
