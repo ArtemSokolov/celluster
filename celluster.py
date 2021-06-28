@@ -25,7 +25,7 @@ def get_markers(markers_file):
     # read markers from file
     f = open(markers_file, 'r')
     for line in f:
-        markers.append(line)
+        markers.append(line.strip())
 
     return markers
 
