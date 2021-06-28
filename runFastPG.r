@@ -10,7 +10,7 @@ cells <- (data[,c('CellID','community')]) # get just cell IDs and community assi
 write.table(cells,file="cells.csv",row.names=FALSE,quote=FALSE,sep=',') # write data to csv
 
 # make clusters.csv
-clusterData <- aggregate(data[,-1], list(data[,'community']), mean) # group feature/expression data by cluster and find mean expression for each cluster
-write.table(clusterData[,-1],file="clusters.csv",row.names=FALSE,quote=FALSE,sep=',') # remove group number because is identical to community assignation number and write data to csv
+clusterData <- aggregate(data[,-2], list(data[,'community']), mean) # group feature/expression data by cluster and find mean expression for each cluster, remove CellID column at column index 2
+write.table(clusterData[,-1],file="clusters.csv",row.names=FALSE,quote=FALSE,sep=',') # remove group number column at index 1 because is identical to community assignation number and write data to csv
 
 cat(clusters$modularity) # output modularity
