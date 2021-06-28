@@ -30,6 +30,8 @@ Exclude the following data from clustering:
 To include any of these markers in the clustering, provide their exact names in a file passed in with the '-m' flag
 '''
 def clean(input_file):
+    print('Cleaning dataset...')
+
     # load csv
     data = pd.read_csv(input_file)
 
@@ -57,11 +59,14 @@ def clean(input_file):
     # save cleaned data to csv
     data.to_csv(f'{output}/clean_data.csv', index=False)
 
+    print('Done.')
+
 
 '''
 Run an R script that runs FastPG. Scriptception.
 '''
 def runFastPG():
+    print('Running R script...')
     import subprocess
 
     r_script = ['Rscript runFastPG.r'] # use FastPG.r script
@@ -73,6 +78,9 @@ def runFastPG():
     # run R script and get modularity from stdout 
     modularity = subprocess.check_output(command, universal_newlines=True)
 
+    print(f'Modularity: {modularity}')
+    print('Done.')
+
 
 '''
 Main.
@@ -82,3 +90,4 @@ if __name__ == '__main__':
     if args.output is None:
         output = '.'
     clean(args.input)
+    runFastPG()
