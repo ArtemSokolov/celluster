@@ -10,7 +10,7 @@ def parseArgs():
     parser.add_argument('-i', '--input', help="Input CSV of mcmicro marker expression data for cells", type=str, required=True)
     parser.add_argument('-o', '--output', help='The directory to which output files will be saved', type=str, required=False)
     parser.add_argument('-m', '--markers', help='A text file with a marker on each line to specify which markers to use for clustering', type=str, required=False)
-    parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', required=False)
+    parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', action="store_true", required=False)
     args = parser.parse_args()
     return args
 
