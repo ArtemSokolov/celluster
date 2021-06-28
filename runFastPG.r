@@ -13,3 +13,5 @@ write.table(cells,file="cells.csv",row.names=FALSE,quote=FALSE,sep=',') # write 
 clusterData <- aggregate(data[,-1], list(data[,'community']), mean) # group feature/expression data by cluster and find mean expression for each cluster
 cols <- cols[cols != 'Group.1'] # remove group number because is identical to community assignation number
 write.table(clusterData[,cols],file="clusters.csv",row.names=FALSE,quote=FALSE,sep=',') # write data to csv
+
+cat(clusters$modularity) # output modularity
