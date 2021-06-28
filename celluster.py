@@ -69,7 +69,7 @@ def runFastPG():
     print('Running R script...')
     import subprocess
 
-    r_script = ['Rscript runFastPG.r'] # use FastPG.r script
+    r_script = ['Rscript', 'celluster/runFastPG.r'] # use FastPG.r script
     r_args = [f'{output}/clean_data.csv', '30'] # current hardcoded arguments will be provided by user in future version
 
     # Build subprocess command
