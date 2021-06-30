@@ -1,3 +1,4 @@
+import re
 import argparse
 import pandas as pd
 
@@ -32,7 +33,7 @@ def get_markers(markers_file):
 
 '''
 Clean data in input file.
-NOTE: Currently we are doing this with pandas however, using csv might be faster.
+NOTE: Currently we are doing this with pandas however, using csv might be faster, or numpy.
 
 Exclude the following data from clustering:
     - X_centroid, …, Extent, Orientation - morphological features
@@ -55,9 +56,9 @@ def clean(input_file):
                         'Area', 'MajorAxisLength', 
                         'MinorAxisLength', 'Eccentricity', 
                         'Solidity', 'Extent', 'Orientation', 
-                        'DNA', 'Hoechst', 'DAP', # DNA stain
-                        'AF', # autofluorescence
-                        'A'] # secondary antibody staining only
+                        'DNA.*', 'Hoechst.*', 'DAP.*', # DNA stain
+                        'AF.*', # autofluorescence
+                        'A\d{3}.*'] # secondary antibody staining only (iy has to have 3 digist after)
 
     CELL_ID = 'CellID' # column name holding cell IDs
 
@@ -69,16 +70,19 @@ def clean(input_file):
 
     # if markers provided, keep only those features and the Cell IDs. It is important that the CellID column is first.
     if args.markers:
-        markers.insert(0, CELL_ID)
+        if CELL_ID not in markers: # add cell ID to list of columns to keep
+            markers.insert(0, CELL_ID)
+        elif markers.index(CELL_ID) != 0: # if cell ID column is included but not first, move it to the front
+            markers.insert(0, markers.pop(markers.index(CELL_ID)))
         data = data[markers]
     else:
         # find any columns in the input csv that should be excluded from clustering be default
         # NOTE: may want to replace this with regex, it might be faster.
         col_to_remove = []
-        for col in data.columns:
-            for feature in FEATURES_TO_REMOVE:
-                if col.startswith(feature):
-                    col_to_remove.append(col)
+        cols = data.columns
+        for feature in FEATURES_TO_REMOVE:
+            r = re.compile(feature)
+            col_to_remove.extend(list(filter(r.match, cols)))
         
         # drop all columns that should be excluded
         data = data.drop(columns=col_to_remove, axis=1)
@@ -99,7 +103,7 @@ def runFastPG():
     import subprocess
 
     r_script = ['Rscript', 'celluster/runFastPG.r'] # use FastPG.r script
-    r_args = [f'{output}/clean_data.csv', '30'] # current hardcoded arguments will be provided by user in future version
+    r_args = [f'{output}/clean_data.csv', '30'] # current hardcoded arguments could be provided by user in future version, k=30 is default
 
     # Build subprocess command
     command = r_script + r_args
