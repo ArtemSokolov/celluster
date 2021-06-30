@@ -88,7 +88,7 @@ def clean(input_file):
         data = data.drop(columns=col_to_remove, axis=1)
 
     # save cleaned data to csv
-    data.to_csv(f'{output}/clean_data.csv', index=False)
+    data.to_csv(f'{output}/{CLEAN_DATA_FILE}', index=False)
 
     if args.verbose:
         print(f'Done. Cleaned data is in {output}/clean_data.csv.')
@@ -103,7 +103,7 @@ def runFastPG():
     import subprocess
 
     r_script = ['Rscript', 'celluster/runFastPG.r'] # use FastPG.r script
-    r_args = [f'{output}/clean_data.csv', '30'] # current hardcoded arguments could be provided by user in future version, k=30 is default
+    r_args = [f'{output}/{CLEAN_DATA_FILE}', '30'] # current hardcoded arguments could be provided by user in future version, k=30 is default
 
     # Build subprocess command
     command = r_script + r_args
@@ -129,6 +129,9 @@ if __name__ == '__main__':
     # get list of markers if provided
     if args.markers is not None:
         markers = get_markers(args.markers)
+
+    # define constant output cleaned data file name
+    CLEAN_DATA_FILE = 'clean_data.csv'
     
     # clean input data file
     clean(args.input)
