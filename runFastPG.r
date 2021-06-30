@@ -1,3 +1,14 @@
+'''
+This R script requires the cleaned data input csv and the local neighborhood size (k) passed as arguments.
+
+runFastPG.r runs the FastPG program (https://github.com/sararselitsky/FastPG) to cluster cells by the markers
+included in the input csv.
+
+Output: 
+    cells.csv - which contains the cell ID and cluster ID
+    clusters.csv - which contains the mean expression values for each marker, for each cluster 
+'''
+
 # get data and cluster it
 args <- commandArgs(trailingOnly=TRUE) # required command line arguments order: {cleaned data csv} {k}
 data <- as.matrix(read.csv(file=args[1])) # load cleaned data into matrix
