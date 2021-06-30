@@ -12,6 +12,8 @@ def parseArgs():
     parser.add_argument('-o', '--output', help='The directory to which output files will be saved', type=str, required=False)
     parser.add_argument('-m', '--markers', help='A text file with a marker on each line to specify which markers to use for clustering', type=str, required=False)
     parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', action="store_true", required=False)
+    parser.add_argument('-k', '--neighbors', help='the number of nearest neighbors to use when clustering. The default is 30.', default=30, type=int, required=False)
+    parser.add_argument('-n', '--num-threads', help='the number of cpus to use during the k nearest neighbors part of clustering. The default is 1.', default=1, type=int, required=False)
     args = parser.parse_args()
     return args
 
@@ -103,7 +105,7 @@ def runFastPG():
     import subprocess
 
     r_script = ['Rscript', 'celluster/runFastPG.r'] # use FastPG.r script
-    r_args = [f'{output}/{CLEAN_DATA_FILE}', '30'] # current hardcoded arguments could be provided by user in future version, k=30 is default
+    r_args = [f'{output}/{CLEAN_DATA_FILE}', str(args.neighbors), str(args.num_threads), output] # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, and output dir
 
     # Build subprocess command
     command = r_script + r_args
@@ -122,9 +124,11 @@ Main.
 if __name__ == '__main__':
     args = parseArgs() # parse arguments
 
-    # get user-defined output dir or set to current
+    # get user-defined output dir (strip last slash if present) or set to current
     if args.output is None:
         output = '.'
+    elif args.output[-1] == '/':
+        output = args.output[:-1]
 
     # get list of markers if provided
     if args.markers is not None:
