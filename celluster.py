@@ -104,7 +104,7 @@ def runFastPG():
         print('Running R script...')
     import subprocess
 
-    r_script = ['Rscript', 'celluster/runFastPG.r'] # use FastPG.r script
+    r_script = ['Rscript', '/app/runFastPG.r'] # use FastPG.r script
     r_args = [f'{output}/{CLEAN_DATA_FILE}', str(args.neighbors), str(args.num_threads), output] # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, and output dir
 
     # Build subprocess command
