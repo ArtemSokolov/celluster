@@ -129,6 +129,8 @@ if __name__ == '__main__':
         output = '.'
     elif args.output[-1] == '/':
         output = args.output[:-1]
+    else:
+        output = args.output
 
     # get list of markers if provided
     if args.markers is not None:
