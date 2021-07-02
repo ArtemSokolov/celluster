@@ -1,5 +1,7 @@
 import re
+import os
 import argparse
+import subprocess
 import pandas as pd
 
 '''
@@ -16,6 +18,16 @@ def parseArgs():
     parser.add_argument('-n', '--num-threads', help='the number of cpus to use during the k nearest neighbors part of clustering. The default is 1.', default=1, type=int, required=False)
     args = parser.parse_args()
     return args
+
+
+'''
+Get the path to the directory where this script is located and return it.
+'''
+def get_path():
+    full_path = os.path.realpath(__file__)
+    path_list = full_path.split('/')[:-1]
+    s = '/'
+    return s.join(path_list)
 
 
 '''
@@ -102,9 +114,10 @@ Run an R script that runs FastPG. Scriptception.
 def runFastPG():
     if args.verbose:
         print('Running R script...')
-    import subprocess
+    
+    path = get_path() # get the path where the r script is located
 
-    r_script = ['Rscript', '/app/runFastPG.r'] # use FastPG.r script
+    r_script = ['Rscript', f'{path}/runFastPG.r'] # use FastPG.r script
     r_args = [f'{output}/{CLEAN_DATA_FILE}', str(args.neighbors), str(args.num_threads), output] # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, and output dir
 
     # Build subprocess command
