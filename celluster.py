@@ -35,6 +35,15 @@ def get_path():
 
 
 '''
+Get input data file name
+'''
+def getDataName(path):
+    fileName = path.split('/')[-1]
+    return fileName
+
+
+
+'''
 Get markers to use for clustering from a text file where each marker is on a line and corresponds exactly to the column name in the input data file.
 Returns a list of markers to use for clustering.
 '''
@@ -200,8 +209,11 @@ if __name__ == '__main__':
     # constants
     CLEAN_DATA_FILE = 'clean_data.csv' # name of output cleaned data CSV file
     CELL_ID = 'CellID' # column name holding cell IDs
-    CLUSTERS_FILE = 'clusters.csv' # name of output CSV file that contains the mean expression of each feaute, for each cluster
-    CELLS_FILE = 'cells.csv' # name of output CSV file that contains each cell ID and it's cluster assignation
+    
+    # output file names
+    data_prefix = getDataName(args.input) # get the name of the input data file to add as a prefix to the output file names
+    clusters_file = f'{data_prefix}_clusters.csv' # name of output CSV file that contains the mean expression of each feaute, for each cluster
+    cells_file = f'{data_prefix}_cells.csv' # name of output CSV file that contains each cell ID and it's cluster assignation
     
     # clean input data file
     clean(args.input)
