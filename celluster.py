@@ -19,7 +19,7 @@ def parseArgs():
     parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', action="store_true", required=False)
     parser.add_argument('-k', '--neighbors', help='the number of nearest neighbors to use when clustering. The default is 30.', default=30, type=int, required=False)
     parser.add_argument('-n', '--num-threads', help='the number of cpus to use during the k nearest neighbors part of clustering. The default is 1.', default=1, type=int, required=False)
-    parser.add_argument('-a', '--algorithm', help='Which agorithm to use for clustering: Louvain or Leiden. Default is Louvain.', type=str, required=False)
+    parser.add_argument('-a', '--algorithm', help='Which agorithm to use for clustering: Louvain or Leiden. Default is Louvain.', default='Louvain', type=str, required=False)
     args = parser.parse_args()
     return args
 
@@ -197,7 +197,6 @@ if __name__ == '__main__':
     if args.markers is not None:
         markers = get_markers(args.markers)
 
-    
     # constants
     CLEAN_DATA_FILE = 'clean_data.csv' # name of output cleaned data CSV file
     CELL_ID = 'CellID' # column name holding cell IDs
@@ -207,5 +206,8 @@ if __name__ == '__main__':
     # clean input data file
     clean(args.input)
 
-    # run FastPG algorithm
-    runFastPG()
+    # run algorithm
+    if args.algorithm == 'Louvain':
+        runFastPG() # run FastPG algorithm
+    elif args.algorithm == 'Leiden':
+        leidenCluster() # cluster using scanpy implementation of Leiden
