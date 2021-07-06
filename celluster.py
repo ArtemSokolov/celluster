@@ -4,8 +4,6 @@ import argparse
 import subprocess
 import numpy as np
 import pandas as pd
-import scanpy as sc
-import anndata as ad
 
 '''
 Parse arguments.
@@ -19,7 +17,6 @@ def parseArgs():
     parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', action="store_true", required=False)
     parser.add_argument('-k', '--neighbors', help='the number of nearest neighbors to use when clustering. The default is 30.', default=30, type=int, required=False)
     parser.add_argument('-n', '--num-threads', help='the number of cpus to use during the k nearest neighbors part of clustering. The default is 1.', default=1, type=int, required=False)
-    parser.add_argument('-a', '--algorithm', help='Which agorithm to use for clustering: Louvain or Leiden. Default is Louvain.', default='Louvain', type=str, required=False)
     args = parser.parse_args()
     return args
 
@@ -144,51 +141,6 @@ def runFastPG():
 
 
 '''
-Write CELLS_FILE from leidenCluster() adata
-'''
-def writeCells(adata, LEIDEN):
-    cells = pd.DataFrame(adata.obs[CELL_ID].astype(int)) # extract cell IDs to dataframe
-    cells[CELL_ID] = adata.obs[LEIDEN] # extract and add cluster assignments to cells dataframe
-    cells.to_csv(f'{output}/{cells_file}', index=False)
-
-
-'''
-Write CLUSTERS_FILE from leidenCluster() adata
-'''
-def writeClusters(adata, LEIDEN):
-    clusters = pd.DataFrame(columns=adata.var_names, index=adata.obs[LEIDEN].cat.categories)                                                                                                 
-    for cluster in adata.obs.leiden.cat.categories: # this assumes that LEIDEN = 'leiden' if the name is changed, replace it for 'leiden' in this line
-        clusters.loc[cluster] = adata[adata.obs[LEIDEN].isin([cluster]),:].X.mean(0)
-    clusters.to_csv(f'{output}/{clusters_file}', index=False)
-
-
-'''
-Cluster data using the Leiden algorithm via scanpy
-'''
-def leidenCluster():
-
-    LEIDEN = 'leiden' # obs name for cluster assignment
-
-    sc.settings.verbosity = 3 # print out information
-    adata_init = sc.read(CLEAN_DATA_FILE, cache=True) # load in clean data
-
-    # move CellID info into .obs
-    # this assumes that 'CELL_ID' is the first column in the csv
-    adata_init.obs[CELL_ID] = adata_init.X[:,0]
-    adata = ad.AnnData(np.delete(adata_init.X, 0, 1), obs=adata_init.obs, var=adata_init.var.drop([CELL_ID]))
-
-    # compute neighbors and cluster
-    sc.pp.neighbors(adata, n_neighbors=args.neighbors, n_pcs=0) # compute neighbors, using the number of neighbors provided in the command line. Default is 30.
-    sc.tl.leiden(adata, key_added = LEIDEN) # run leidan clustering. default resolution in 1.0
-
-    # write cell/cluster information to 'CELLS_FILE'
-    writeCells(adata, LEIDEN)
-
-    # write cluster mean feature expression to 'CLUSTERS_FILE'
-    writeClusters(adata, LEIDEN)
-
-
-'''
 Main.
 '''
 if __name__ == '__main__':
@@ -218,8 +170,5 @@ if __name__ == '__main__':
     # clean input data file
     clean(args.input)
 
-    # run algorithm
-    if args.algorithm == 'Louvain':
-        runFastPG() # run FastPG algorithm
-    elif args.algorithm == 'Leiden':
-        leidenCluster() # cluster using scanpy implementation of Leiden
+    # run FastPG algorithm
+    runFastPG()
