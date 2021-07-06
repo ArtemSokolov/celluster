@@ -16,6 +16,7 @@ def parseArgs():
     parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', action="store_true", required=False)
     parser.add_argument('-k', '--neighbors', help='the number of nearest neighbors to use when clustering. The default is 30.', default=30, type=int, required=False)
     parser.add_argument('-n', '--num-threads', help='the number of cpus to use during the k nearest neighbors part of clustering. The default is 1.', default=1, type=int, required=False)
+    parser.add_argument('-c', '--method', help='Include a column with the method name in the output files.', action="store_true", required=False)
     args = parser.parse_args()
     return args
 
@@ -126,7 +127,7 @@ def runFastPG():
 
     r_script = ['Rscript', f'{path}/runFastPG.r'] # use FastPG.r script
     # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name
-    r_args = [f'{output}/{clean_data_file}', str(args.neighbors), str(args.num_threads), output, cells_file, clusters_file]
+    r_args = [f'{output}/{clean_data_file}', str(args.neighbors), str(args.num_threads), output, cells_file, clusters_file, args.method]
 
     # Build subprocess command
     command = r_script + r_args
