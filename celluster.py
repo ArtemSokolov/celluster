@@ -134,6 +134,24 @@ def runFastPG():
         print('Done.')
 
 
+'''
+Write CELLS_FILE from leidenCluster() adata
+'''
+def writeCells(adata, LEIDEN):
+    cells = pd.DataFrame(adata.obs[CELL_ID].astype(int)) # extract cell IDs to dataframe
+    cells[CELL_ID] = adata.obs[LEIDEN] # extract and add cluster assignments to cells dataframe
+    cells.to_csv(f'{output}/{CELLS_FILE}', index=False)
+
+
+'''
+Write CLUSTERS_FILE from leidenCluster() adata
+'''
+def writeClusters(adata, LEIDEN):
+    clusters = pd.DataFrame(columns=adata.var_names, index=adata.obs[LEIDEN].cat.categories)                                                                                                 
+    for cluster in adata.obs.leiden.cat.categories: # this assumes that LEIDEN = 'leiden' if the name is changed, replace it for 'leiden' in this line
+        clusters.loc[cluster] = adata[adata.obs[LEIDEN].isin([cluster]),:].X.mean(0)
+    clusters.to_csv(f'{output}/{CLUSTERS_FILE}', index=False)
+
 
 '''
 Cluster data using the Leiden algorithm via scanpy
@@ -155,16 +173,10 @@ def leidenCluster():
     sc.tl.leiden(adata, key_added = LEIDEN) # run leidan clustering. default resolution in 1.0
 
     # write cell/cluster information to 'CELLS_FILE'
-    cells = pd.DataFrame(adata.obs[CELL_ID].astype(int)) # extract cell IDs to dataframe
-    cells[CELL_ID] = adata.obs[LEIDEN] # extract and add cluster assignments to cells dataframe
-    cells.to_csv(f'{output}/{CELLS_FILE}', index=False)
+    writeCells(adata, LEIDEN)
 
     # write cluster mean feature expression to 'CLUSTERS_FILE'
-    clusters = pd.DataFrame(columns=adata.var_names, index=adata.obs[LEIDEN].cat.categories)                                                                                                 
-    for cluster in adata.obs.leiden.cat.categories: # this assumes that LEIDEN = 'leiden' if the name is changed, replace it for 'leiden' in this line
-        clusters.loc[cluster] = adata[adata.obs[LEIDEN].isin([cluster]),:].X.mean(0)
-    clusters.to_csv(f'{output}/{CLUSTERS_FILE}', index=False)
-
+    writeClusters(adata, LEIDEN)
 
 
 '''
