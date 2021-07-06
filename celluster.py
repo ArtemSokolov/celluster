@@ -39,7 +39,6 @@ def getDataName(path):
     return dataName
 
 
-
 '''
 Get markers to use for clustering from a text file where each marker is on a line and corresponds exactly to the column name in the input data file.
 Returns a list of markers to use for clustering.
