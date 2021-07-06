@@ -109,7 +109,7 @@ def clean(input_file):
         data = data.drop(columns=col_to_remove, axis=1)
 
     # save cleaned data to csv
-    data.to_csv(f'{output}/{CLEAN_DATA_FILE}', index=False)
+    data.to_csv(f'{output}/{clean_data_file}', index=False)
 
     if args.verbose:
         print(f'Done. Cleaned data is in {output}/clean_data.csv.')
@@ -126,7 +126,7 @@ def runFastPG():
 
     r_script = ['Rscript', f'{path}/runFastPG.r'] # use FastPG.r script
     # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name
-    r_args = [f'{output}/{CLEAN_DATA_FILE}', str(args.neighbors), str(args.num_threads), output, cells_file, clusters_file]
+    r_args = [f'{output}/{clean_data_file}', str(args.neighbors), str(args.num_threads), output, cells_file, clusters_file]
 
     # Build subprocess command
     command = r_script + r_args
@@ -158,11 +158,11 @@ if __name__ == '__main__':
         markers = get_markers(args.markers)
 
     # constants
-    CLEAN_DATA_FILE = 'clean_data.csv' # name of output cleaned data CSV file
     CELL_ID = 'CellID' # column name holding cell IDs
     
     # output file names
     data_prefix = getDataName(args.input) # get the name of the input data file to add as a prefix to the output file names
+    clean_data_file = f'{data_prefix}-clean.csv' # name of output cleaned data CSV file
     clusters_file = f'{data_prefix}-clusters.csv' # name of output CSV file that contains the mean expression of each feaute, for each cluster
     cells_file = f'{data_prefix}-cells.csv' # name of output CSV file that contains each cell ID and it's cluster assignation
     
