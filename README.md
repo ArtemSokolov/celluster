@@ -12,8 +12,7 @@ where `unmicst-exemplar-001.csv` is a [spatial feature table](https://mcmicro.or
 ## Parameter Reference
 
 ```
-usage: celluster.py [-h] -i INPUT [-o OUTPUT] [-m MARKERS] [-v] [-k NEIGHBORS]
-                    [-n NUM_THREADS]
+usage: celluster.py [-h] -i INPUT [-o OUTPUT] [-m MARKERS] [-v] [-k NEIGHBORS] [-n NUM_THREADS] [-a ALGORITHM]
 
 Cluster cell types using mcmicro marker expression data.
 
@@ -24,13 +23,12 @@ optional arguments:
   -o OUTPUT, --output OUTPUT
                         The directory to which output files will be saved
   -m MARKERS, --markers MARKERS
-                        A text file with a marker on each line to specify
-                        which markers to use for clustering
+                        A text file with a marker on each line to specify which markers to use for clustering
   -v, --verbose         Flag to print out progress of script
   -k NEIGHBORS, --neighbors NEIGHBORS
-                        the number of nearest neighbors to use when
-                        clustering. The default is 30.
+                        the number of nearest neighbors to use when clustering. The default is 30.
   -n NUM_THREADS, --num-threads NUM_THREADS
-                        the number of cpus to use during the k nearest
-                        neighbors part of clustering. The default is 1.
+                        the number of cpus to use during the k nearest neighbors part of clustering. The default is 1.
+  -a ALGORITHM, --algorithm ALGORITHM
+                        Which agorithm to use for clustering: Louvain or Leiden. Default is Louvain.
 ```
