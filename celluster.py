@@ -130,7 +130,7 @@ def runFastPG():
 
     r_script = ['Rscript', f'{path}/runFastPG.r'] # use FastPG.r script
     # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name
-    r_args = [f'{output}/{CLEAN_DATA_FILE}', str(args.neighbors), str(args.num_threads), output, CELLS_FILE, CLUSTERS_FILE]
+    r_args = [f'{output}/{CLEAN_DATA_FILE}', str(args.neighbors), str(args.num_threads), output, cells_file, clusters_file]
 
     # Build subprocess command
     command = r_script + r_args
@@ -149,7 +149,7 @@ Write CELLS_FILE from leidenCluster() adata
 def writeCells(adata, LEIDEN):
     cells = pd.DataFrame(adata.obs[CELL_ID].astype(int)) # extract cell IDs to dataframe
     cells[CELL_ID] = adata.obs[LEIDEN] # extract and add cluster assignments to cells dataframe
-    cells.to_csv(f'{output}/{CELLS_FILE}', index=False)
+    cells.to_csv(f'{output}/{cells_file}', index=False)
 
 
 '''
@@ -159,7 +159,7 @@ def writeClusters(adata, LEIDEN):
     clusters = pd.DataFrame(columns=adata.var_names, index=adata.obs[LEIDEN].cat.categories)                                                                                                 
     for cluster in adata.obs.leiden.cat.categories: # this assumes that LEIDEN = 'leiden' if the name is changed, replace it for 'leiden' in this line
         clusters.loc[cluster] = adata[adata.obs[LEIDEN].isin([cluster]),:].X.mean(0)
-    clusters.to_csv(f'{output}/{CLUSTERS_FILE}', index=False)
+    clusters.to_csv(f'{output}/{clusters_file}', index=False)
 
 
 '''
