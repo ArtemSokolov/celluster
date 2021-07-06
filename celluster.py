@@ -31,6 +31,15 @@ def get_path():
 
 
 '''
+Get input data file name
+'''
+def getDataName(path):
+    fileName = path.split('/')[-1]
+    return fileName
+
+
+
+'''
 Get markers to use for clustering from a text file where each marker is on a line and corresponds exactly to the column name in the input data file.
 Returns a list of markers to use for clustering.
 '''
@@ -74,8 +83,6 @@ def clean(input_file):
                         'AF.*', # autofluorescence
                         'A\d{3}.*'] # secondary antibody staining only (iy has to have 3 digist after)
 
-    CELL_ID = 'CellID' # column name holding cell IDs
-
     if args.verbose:
         print('Cleaning data...')
 
@@ -118,7 +125,8 @@ def runFastPG():
     path = get_path() # get the path where the r script is located
 
     r_script = ['Rscript', f'{path}/runFastPG.r'] # use FastPG.r script
-    r_args = [f'{output}/{CLEAN_DATA_FILE}', str(args.neighbors), str(args.num_threads), output] # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, and output dir
+    # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name
+    r_args = [f'{output}/{CLEAN_DATA_FILE}', str(args.neighbors), str(args.num_threads), output, cells_file, clusters_file]
 
     # Build subprocess command
     command = r_script + r_args
@@ -149,8 +157,14 @@ if __name__ == '__main__':
     if args.markers is not None:
         markers = get_markers(args.markers)
 
-    # define constant output cleaned data file name
-    CLEAN_DATA_FILE = 'clean_data.csv'
+    # constants
+    CLEAN_DATA_FILE = 'clean_data.csv' # name of output cleaned data CSV file
+    CELL_ID = 'CellID' # column name holding cell IDs
+    
+    # output file names
+    data_prefix = getDataName(args.input) # get the name of the input data file to add as a prefix to the output file names
+    clusters_file = f'{data_prefix}_clusters.csv' # name of output CSV file that contains the mean expression of each feaute, for each cluster
+    cells_file = f'{data_prefix}_cells.csv' # name of output CSV file that contains each cell ID and it's cluster assignation
     
     # clean input data file
     clean(args.input)
