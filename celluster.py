@@ -2,7 +2,10 @@ import re
 import os
 import argparse
 import subprocess
+import numpy as np
 import pandas as pd
+import scanpy as sc
+import anndata as ad
 
 '''
 Parse arguments.
@@ -16,6 +19,7 @@ def parseArgs():
     parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', action="store_true", required=False)
     parser.add_argument('-k', '--neighbors', help='the number of nearest neighbors to use when clustering. The default is 30.', default=30, type=int, required=False)
     parser.add_argument('-n', '--num-threads', help='the number of cpus to use during the k nearest neighbors part of clustering. The default is 1.', default=1, type=int, required=False)
+    parser.add_argument('-a', '--algorithm', help='Which agorithm to use for clustering: Louvain or Leiden. Default is Louvain.', type=str, required=False)
     args = parser.parse_args()
     return args
 
@@ -74,8 +78,6 @@ def clean(input_file):
                         'AF.*', # autofluorescence
                         'A\d{3}.*'] # secondary antibody staining only (iy has to have 3 digist after)
 
-    CELL_ID = 'CellID' # column name holding cell IDs
-
     if args.verbose:
         print('Cleaning data...')
 
@@ -118,7 +120,8 @@ def runFastPG():
     path = get_path() # get the path where the r script is located
 
     r_script = ['Rscript', f'{path}/runFastPG.r'] # use FastPG.r script
-    r_args = [f'{output}/{CLEAN_DATA_FILE}', str(args.neighbors), str(args.num_threads), output] # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, and output dir
+    # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name
+    r_args = [f'{output}/{CLEAN_DATA_FILE}', str(args.neighbors), str(args.num_threads), output, CELLS_FILE, CLUSTERS_FILE]
 
     # Build subprocess command
     command = r_script + r_args
@@ -129,6 +132,39 @@ def runFastPG():
     if args.verbose:
         print(f'Modularity: {modularity}')
         print('Done.')
+
+
+
+'''
+Cluster data using the Leiden algorithm via scanpy
+'''
+def leidenCluster():
+
+    LEIDEN = 'leiden' # obs name for cluster assignment
+
+    sc.settings.verbosity = 3 # print out information
+    adata_init = sc.read(CLEAN_DATA_FILE, cache=True) # load in clean data
+
+    # move CellID info into .obs
+    # this assumes that 'CELL_ID' is the first column in the csv
+    adata_init.obs[CELL_ID] = adata_init.X[:,0]
+    adata = ad.AnnData(np.delete(adata_init.X, 0, 1), obs=adata_init.obs, var=adata_init.var.drop([CELL_ID]))
+
+    # compute neighbors and cluster
+    sc.pp.neighbors(adata, n_neighbors=args.neighbors, n_pcs=0) # compute neighbors, using the number of neighbors provided in the command line. Default is 30.
+    sc.tl.leiden(adata, key_added = LEIDEN) # run leidan clustering. default resolution in 1.0
+
+    # write cell/cluster information to 'CELLS_FILE'
+    cells = pd.DataFrame(adata.obs[CELL_ID].astype(int)) # extract cell IDs to dataframe
+    cells[CELL_ID] = adata.obs[LEIDEN] # extract and add cluster assignments to cells dataframe
+    cells.to_csv(f'{output}/{CELLS_FILE}', index=False)
+
+    # write cluster mean feature expression to 'CLUSTERS_FILE'
+    clusters = pd.DataFrame(columns=adata.var_names, index=adata.obs[LEIDEN].cat.categories)                                                                                                 
+    for cluster in adata.obs.leiden.cat.categories: # this assumes that LEIDEN = 'leiden' if the name is changed, replace it for 'leiden' in this line
+        clusters.loc[cluster] = adata[adata.obs[LEIDEN].isin([cluster]),:].X.mean(0)
+    clusters.to_csv(f'{output}/{CLUSTERS_FILE}', index=False)
+
 
 
 '''
@@ -149,8 +185,12 @@ if __name__ == '__main__':
     if args.markers is not None:
         markers = get_markers(args.markers)
 
-    # define constant output cleaned data file name
-    CLEAN_DATA_FILE = 'clean_data.csv'
+    
+    # constants
+    CLEAN_DATA_FILE = 'clean_data.csv' # name of output cleaned data CSV file
+    CELL_ID = 'CellID' # column name holding cell IDs
+    CLUSTERS_FILE = 'clusters.csv' # name of output CSV file that contains the mean expression of each feaute, for each cluster
+    CELLS_FILE = 'cells.csv' # name of output CSV file that contains each cell ID and it's cluster assignation
     
     # clean input data file
     clean(args.input)
