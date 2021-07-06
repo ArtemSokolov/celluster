@@ -31,7 +31,7 @@ write.table(cells,file=paste(args[4], args[5], sep='/'),row.names=FALSE,quote=FA
 
 # make clusters.csv
 clusterData <- aggregate(subset(data, select=-c(CellID)), list(data[,'Cluster']), mean) # group feature/expression data by cluster and find mean expression for each cluster, remove CellID column
-clusterData <- subset(clusterData, select=-c(Group.1)) # remove group number column because is identical to community assignation number 
+clusterData <- subset(clusterData, select=-c(Group.1)) # remove group number column because is identical to community assignation number
 if (args[7]) { # inlcude method column
     clusterData['Method'] = 'FastPG'
 }
