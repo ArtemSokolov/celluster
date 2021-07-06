@@ -34,8 +34,9 @@ def get_path():
 Get input data file name
 '''
 def getDataName(path):
-    fileName = path.split('/')[-1]
-    return fileName
+    fileName = path.split('/')[-1] # get filename from end of input path
+    dataName = fileName[:fileName.rfind('.')] # get data name by removing extension from file name
+    return dataName
 
 
 
