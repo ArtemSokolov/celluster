@@ -24,17 +24,19 @@ data <- cbind(Cluster, data) # add community assignation to data
 
 # make cells.csv
 cells <- (data[,c('CellID','Cluster')]) # get just cell IDs and community assignations for export
-if (args[7]) { # inlcude method column
-    cells['Method'] = 'FastPG'
+if (as.logical(args[7])) { # inlcude method column
+    Method <- rep(c('FastPG'),nrow(cells))
+    cells <- cbind(cells, Method)
 }
 write.table(cells,file=paste(args[4], args[5], sep='/'),row.names=FALSE,quote=FALSE,sep=',') # write data to csv
 
 # make clusters.csv
 clusterData <- aggregate(subset(data, select=-c(CellID)), list(data[,'Cluster']), mean) # group feature/expression data by cluster and find mean expression for each cluster, remove CellID column
 clusterData <- subset(clusterData, select=-c(Group.1)) # remove group number column because is identical to community assignation number
-if (args[7]) { # inlcude method column
-    clusterData['Method'] = 'FastPG'
+if (as.logical(args[7])) { # inlcude method column
+    Method <- rep(c('FastPG'),nrow(clusterData))
+    clusterData <- cbind(clusterData, Method)
 }
-write.table(,file=paste(args[4], args[6], sep='/'),row.names=FALSE,quote=FALSE,sep=',') # write data to csv
+write.table(clusterData,file=paste(args[4], args[6], sep='/'),row.names=FALSE,quote=FALSE,sep=',') # write data to csv
 
 cat(clusters$modularity) # output modularity

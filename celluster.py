@@ -113,7 +113,7 @@ def clean(input_file):
     data.to_csv(f'{output}/{clean_data_file}', index=False)
 
     if args.verbose:
-        print(f'Done. Cleaned data is in {output}/clean_data.csv.')
+        print(f'Done. Cleaned data is in {output}/{clean_data_file}.csv.')
 
 
 '''
@@ -127,7 +127,7 @@ def runFastPG():
 
     r_script = ['Rscript', f'{path}/runFastPG.r'] # use FastPG.r script
     # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name
-    r_args = [f'{output}/{clean_data_file}', str(args.neighbors), str(args.num_threads), output, cells_file, clusters_file, args.method]
+    r_args = [f'{output}/{clean_data_file}', str(args.neighbors), str(args.num_threads), output, cells_file, clusters_file, str(args.method)]
 
     # Build subprocess command
     command = r_script + r_args
