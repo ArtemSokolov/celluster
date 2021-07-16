@@ -1,10 +1,10 @@
-# celluster
+# mcmicro-fastPG
 
 An mcmicro module that provides a command-line interface for [FastPG](https://github.com/sararselitsky/FastPG), a C++ implementation of the popular Phenograph method.
 
 Example usage:
 ```
-docker run --rm -v "$PWD":/data labsyspharm/celluster:1.0.2 python3 /app/celluster.py \
+docker run --rm -v "$PWD":/data labsyspharm/celluster:1.0.2 python3 /app/cluster.py \
   -i /data/unmicst-exemplar-001.csv -o /data/
 ```
 where `unmicst-exemplar-001.csv` is a [spatial feature table](https://mcmicro.org/step-quant.html) produced by MCMICRO. Note that the above command must be executed from the directory containing `uncmist-exemplar-001.csv`. Alternatively, replace `"$PWD"` with a full path to the data.
@@ -12,7 +12,7 @@ where `unmicst-exemplar-001.csv` is a [spatial feature table](https://mcmicro.or
 ## Parameter Reference
 
 ```
-usage: celluster.py [-h] -i INPUT [-o OUTPUT] [-m MARKERS] [-v] [-k NEIGHBORS] [-n NUM_THREADS]
+usage: cluster.py [-h] -i INPUT [-o OUTPUT] [-m MARKERS] [-v] [-k NEIGHBORS] [-n NUM_THREADS]
 
 Cluster cell types using mcmicro marker expression data.
 
