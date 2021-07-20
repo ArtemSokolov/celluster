@@ -4,15 +4,15 @@ An mcmicro module that provides a command-line interface for [FastPG](https://gi
 
 Example usage:
 ```
-docker run --rm -v "$PWD":/data labsyspharm/celluster:1.0.2 python3 /app/celluster.py \
+docker run --rm -v "$PWD":/data labsyspharm/mc-fastpg:1.0.4 python3 /app/cluster.py \
   -i /data/unmicst-exemplar-001.csv -o /data/
 ```
-where `unmicst-exemplar-001.csv` is a [spatial feature table](https://mcmicro.org/step-quant.html) produced by MCMICRO. Note that the above command must be executed from the directory containing `uncmist-exemplar-001.csv`. Alternatively, replace `"$PWD"` with a full path to the data.
+where `unmicst-exemplar-001.csv` is a [spatial feature table](https://mcmicro.org/step-quant.html) produced by MCMICRO. Note that the above command must be executed from the directory containing `uncmist-exemplar-001.csv`. Alternatively, replace `"$PWD"` with a full path to the data. If the largest value in the input dataset is >1000, the data will be log10 transformed. This will be reflected in the means of the output `clusters` file.
 
 ## Parameter Reference
 
 ```
-usage: celluster.py [-h] -i INPUT [-o OUTPUT] [-m MARKERS] [-v] [-k NEIGHBORS] [-n NUM_THREADS]
+usage: cluster.py [-h] -i INPUT [-o OUTPUT] [-m MARKERS] [-v] [-k NEIGHBORS] [-n NUM_THREADS] [-c]
 
 Cluster cell types using mcmicro marker expression data.
 
@@ -29,4 +29,5 @@ optional arguments:
                         the number of nearest neighbors to use when clustering. The default is 30.
   -n NUM_THREADS, --num-threads NUM_THREADS
                         the number of cpus to use during the k nearest neighbors part of clustering. The default is 1.
+  -c, --method          Include a column with the method name in the output files.
 ```
