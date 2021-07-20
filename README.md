@@ -12,7 +12,7 @@ where `unmicst-exemplar-001.csv` is a [spatial feature table](https://mcmicro.or
 ## Parameter Reference
 
 ```
-usage: celluster.py [-h] -i INPUT [-o OUTPUT] [-m MARKERS] [-v] [-k NEIGHBORS] [-n NUM_THREADS]
+usage: celluster.py [-h] -i INPUT [-o OUTPUT] [-m MARKERS] [-v] [-k NEIGHBORS] [-n NUM_THREADS] [-c]
 
 Cluster cell types using mcmicro marker expression data.
 
@@ -29,4 +29,5 @@ optional arguments:
                         the number of nearest neighbors to use when clustering. The default is 30.
   -n NUM_THREADS, --num-threads NUM_THREADS
                         the number of cpus to use during the k nearest neighbors part of clustering. The default is 1.
+  -c, --method          Include a column with the method name in the output files.
 ```
