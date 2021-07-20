@@ -7,7 +7,7 @@ Example usage:
 docker run --rm -v "$PWD":/data labsyspharm/celluster:1.0.2 python3 /app/celluster.py \
   -i /data/unmicst-exemplar-001.csv -o /data/
 ```
-where `unmicst-exemplar-001.csv` is a [spatial feature table](https://mcmicro.org/step-quant.html) produced by MCMICRO. Note that the above command must be executed from the directory containing `uncmist-exemplar-001.csv`. Alternatively, replace `"$PWD"` with a full path to the data.
+where `unmicst-exemplar-001.csv` is a [spatial feature table](https://mcmicro.org/step-quant.html) produced by MCMICRO. Note that the above command must be executed from the directory containing `uncmist-exemplar-001.csv`. Alternatively, replace `"$PWD"` with a full path to the data. If the largest value in the input dataset is >1000, the data will be log10 transformed. This will be reflected in the means of the output `clusters` file.
 
 ## Parameter Reference
 

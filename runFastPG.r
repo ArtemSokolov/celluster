@@ -15,13 +15,20 @@
 #     clusters.csv - which contains the mean expression values for each marker, for each cluster
 
 
-# get data and cluster it
+# get data
 args <- commandArgs(trailingOnly=TRUE) # required command line arguments order: {cleaned data csv} {k} {num_threads} {output dir}
 data <- read.csv(file=args[1]) # read data
 CellID <- data$CellID # save cell ID's
 data <- subset(data, select = -c(CellID)) # remove Cell ID's from data so they aren't used for clustering
 data <- as.matrix(data) # write data to matrix so it can be processed by FastPG
 rownames(data) <- CellID # save rownames of data matrix as cell ID's
+
+# log transform data if the max value >1000
+if (max(apply(data,2,max)) > 1000) {
+     data <- log10(data)
+}
+
+# cluster data
 clusters <- FastPG::fastCluster(data=data, k=as.integer(args[2]), num_threads=as.integer(args[3])) # compute clusters
 Cluster <- clusters$communities # get all cell community assignations (these are in the same order as cells in data)
 data <- cbind(Cluster, CellID, data) # add community assignation to data
