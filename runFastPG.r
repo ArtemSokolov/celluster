@@ -9,6 +9,7 @@
 #     5. output file name for cell/cluster assignment
 #     6. output file name for cluster mean feature values
 #     7. flag to include method name as a column
+#     8. log transform flag
 #
 # Output: 
 #     cells.csv - which contains the cell ID and cluster ID
@@ -24,7 +25,10 @@ data <- as.matrix(data) # write data to matrix so it can be processed by FastPG
 rownames(data) <- CellID # save rownames of data matrix as cell ID's
 
 # log transform data if the max value >1000
-if (max(apply(data,2,max)) > 1000) {
+if (args[8] == 'true') {
+    data <- log10(data)
+}
+else if (args[8] == 'auto' && max(apply(data,2,max)) > 1000) {
      data <- log10(data)
 }
 
