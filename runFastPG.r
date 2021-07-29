@@ -27,8 +27,7 @@ rownames(data) <- CellID # save rownames of data matrix as cell ID's
 # log transform data if the max value >1000
 if (args[8] == 'true') {
     data <- log10(data)
-}
-else if (args[8] == 'auto' && max(apply(data,2,max)) > 1000) {
+} else if (args[8] == 'auto' && max(apply(data,2,max)) > 1000) {
      data <- log10(data)
 }
 
