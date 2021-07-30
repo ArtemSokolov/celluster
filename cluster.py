@@ -145,7 +145,7 @@ def runFastPG():
 
 
 '''
-Read config.yaml file contents.
+Read config.yml file contents.
 '''
 def readConfig(file):
     f = open(file, 'r')

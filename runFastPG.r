@@ -25,21 +25,18 @@ data <- as.matrix(data) # write data to matrix so it can be processed by FastPG
 rownames(data) <- CellID # save rownames of data matrix as cell ID's
 
 # log transform data according to flag, if auto, transform if the max value >1000. write state to yaml file
+dir.create('qc')
+f <- file('qc/config.yml')
 if (args[8] == 'true') {
     data <- log10(data)
-    f <- file('config.yaml')
     writeLines(c('---','transform: true'), f)
-    close(f)
 } else if (args[8] == 'auto' && max(apply(data,2,max)) > 1000) {
     data <- log10(data)
-    f <- file('config.yaml')
     writeLines(c('---','transform: true'), f)
-    close(f)
 } else {
-    f <- file('config.yaml')
     writeLines(c('---','transform: false'), f)
-    close(f)
 }
+close(f)
 
 # cluster data
 clusters <- FastPG::fastCluster(data=data, k=as.integer(args[2]), num_threads=as.integer(args[3])) # compute clusters
