@@ -4,6 +4,7 @@ import argparse
 import subprocess
 import pandas as pd
 
+
 '''
 Parse arguments.
 Input file is required.
@@ -17,6 +18,7 @@ def parseArgs():
     parser.add_argument('-k', '--neighbors', help='the number of nearest neighbors to use when clustering. The default is 30.', default=30, type=int, required=False)
     parser.add_argument('-n', '--num-threads', help='the number of cpus to use during the k nearest neighbors part of clustering. The default is 1.', default=1, type=int, required=False)
     parser.add_argument('-c', '--method', help='Include a column with the method name in the output files.', action="store_true", required=False)
+    parser.add_argument('-y', '--config', help='A yaml config file that states whether the input data should be log/logicle transformed.', type=str, required=False)
     parser.add_argument('--force-transform', help='Log transform the input data. If omitted, and --no-transform is omitted, log transform is only performed if the max value in the input data is >1000.', action='store_true', required=False)
     parser.add_argument('--no-transform', help='Do not perform Log transformation on the input data. If omitted, and --force-transform is omitted, log transform is only performed if the max value in the input data is >1000.', action='store_true', required=False)
     args = parser.parse_args()
@@ -143,6 +145,21 @@ def runFastPG():
 
 
 '''
+Read config.yaml file contents.
+'''
+def readConfig(file):
+    f = open(file, 'r')
+    lines = f.readlines()
+
+    # find line with 'transform:' in it
+    for l in lines:
+        if 'transform:' in l.strip():
+            transform = l.split(':')[-1] # get last value after colon
+
+    return transform
+
+
+'''
 Main.
 '''
 if __name__ == '__main__':
@@ -165,6 +182,8 @@ if __name__ == '__main__':
         transform = 'true'
     elif not args.force_transform and args.no_transform:
         transform = 'false'
+    elif args.config is not None:
+        transform = readConfig(args.config)
     else:
         transform = 'auto'
 
