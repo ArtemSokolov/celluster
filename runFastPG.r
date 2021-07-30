@@ -24,11 +24,21 @@ data <- subset(data, select = -c(CellID)) # remove Cell ID's from data so they a
 data <- as.matrix(data) # write data to matrix so it can be processed by FastPG
 rownames(data) <- CellID # save rownames of data matrix as cell ID's
 
-# log transform data if the max value >1000
+# log transform data according to flag, if auto, transform if the max value >1000. write state to yaml file
 if (args[8] == 'true') {
     data <- log10(data)
+    f <- file('config.yaml')
+    writeLines(c('---','transform: true'), f)
+    close(f)
 } else if (args[8] == 'auto' && max(apply(data,2,max)) > 1000) {
-     data <- log10(data)
+    data <- log10(data)
+    f <- file('config.yaml')
+    writeLines(c('---','transform: true'), f)
+    close(f)
+} else {
+    f <- file('config.yaml')
+    writeLines(c('---','transform: false'), f)
+    close(f)
 }
 
 # cluster data
