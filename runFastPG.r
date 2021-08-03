@@ -9,6 +9,7 @@
 #     5. output file name for cell/cluster assignment
 #     6. output file name for cluster mean feature values
 #     7. flag to include method name as a column
+#     8. log transform flag
 #
 # Output: 
 #     cells.csv - which contains the cell ID and cluster ID
@@ -23,10 +24,19 @@ data <- subset(data, select = -c(CellID)) # remove Cell ID's from data so they a
 data <- as.matrix(data) # write data to matrix so it can be processed by FastPG
 rownames(data) <- CellID # save rownames of data matrix as cell ID's
 
-# log transform data if the max value >1000
-if (max(apply(data,2,max)) > 1000) {
-     data <- log10(data)
+# log transform data according to flag, if auto, transform if the max value >1000. write state to yaml file
+dir.create('qc')
+f <- file('qc/config.yml')
+if (args[8] == 'true') {
+    data <- log10(data)
+    writeLines(c('---','transform: true'), f)
+} else if (args[8] == 'auto' && max(apply(data,2,max)) > 1000) {
+    data <- log10(data)
+    writeLines(c('---','transform: true'), f)
+} else {
+    writeLines(c('---','transform: false'), f)
 }
+close(f)
 
 # cluster data
 clusters <- FastPG::fastCluster(data=data, k=as.integer(args[2]), num_threads=as.integer(args[3])) # compute clusters

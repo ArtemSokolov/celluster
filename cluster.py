@@ -4,6 +4,7 @@ import argparse
 import subprocess
 import pandas as pd
 
+
 '''
 Parse arguments.
 Input file is required.
@@ -17,6 +18,9 @@ def parseArgs():
     parser.add_argument('-k', '--neighbors', help='the number of nearest neighbors to use when clustering. The default is 30.', default=30, type=int, required=False)
     parser.add_argument('-n', '--num-threads', help='the number of cpus to use during the k nearest neighbors part of clustering. The default is 1.', default=1, type=int, required=False)
     parser.add_argument('-c', '--method', help='Include a column with the method name in the output files.', action="store_true", required=False)
+    parser.add_argument('-y', '--config', help='A yaml config file that states whether the input data should be log/logicle transformed.', type=str, required=False)
+    parser.add_argument('--force-transform', help='Log transform the input data. If omitted, and --no-transform is omitted, log transform is only performed if the max value in the input data is >1000.', action='store_true', required=False)
+    parser.add_argument('--no-transform', help='Do not perform Log transformation on the input data. If omitted, and --force-transform is omitted, log transform is only performed if the max value in the input data is >1000.', action='store_true', required=False)
     args = parser.parse_args()
     return args
 
@@ -126,8 +130,8 @@ def runFastPG():
     path = get_path() # get the path where the r script is located
 
     r_script = ['Rscript', f'{path}/runFastPG.r'] # use FastPG.r script
-    # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name
-    r_args = [f'{output}/{clean_data_file}', str(args.neighbors), str(args.num_threads), output, cells_file, clusters_file, str(args.method)]
+    # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name, log transform flag
+    r_args = [f'{output}/{clean_data_file}', str(args.neighbors), str(args.num_threads), output, cells_file, clusters_file, str(args.method), transform]
 
     # Build subprocess command
     command = r_script + r_args
@@ -138,6 +142,21 @@ def runFastPG():
     if args.verbose:
         print(f'Modularity: {modularity}')
         print('Done.')
+
+
+'''
+Read config.yml file contents.
+'''
+def readConfig(file):
+    f = open(file, 'r')
+    lines = f.readlines()
+
+    # find line with 'transform:' in it
+    for l in lines:
+        if 'transform:' in l.strip():
+            transform = l.split(':')[-1].strip() # get last value after colon
+
+    return transform
 
 
 '''
@@ -157,6 +176,16 @@ if __name__ == '__main__':
     # get list of markers if provided
     if args.markers is not None:
         markers = get_markers(args.markers)
+
+    # assess log transform parameter
+    if args.force_transform and not args.no_transform:
+        transform = 'true'
+    elif not args.force_transform and args.no_transform:
+        transform = 'false'
+    elif args.config is not None:
+        transform = readConfig(args.config)
+    else:
+        transform = 'auto'
 
     # constants
     CELL_ID = 'CellID' # column name holding cell IDs
