@@ -28,10 +28,10 @@ rownames(data) <- CellID # save rownames of data matrix as cell ID's
 dir.create('qc')
 f <- file('qc/config.yml')
 if (args[8] == 'true') {
-    data <- log10(data)
+    data <- log10(data + 1)
     writeLines(c('---','transform: true'), f)
 } else if (args[8] == 'auto' && max(apply(data,2,max)) > 1000) {
-    data <- log10(data)
+    data <- log10(data + 1)
     writeLines(c('---','transform: true'), f)
 } else {
     writeLines(c('---','transform: false'), f)
