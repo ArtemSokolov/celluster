@@ -28,7 +28,7 @@ jobs:
       - name: Upload processed result
         uses: actions/upload-artifact@v2
         with:
-          name: exemplar-001-cycle-06
+          name: exemplar-001-fastpg
           path: |
             ~/data/*.csv
             ~/data/qc/**
